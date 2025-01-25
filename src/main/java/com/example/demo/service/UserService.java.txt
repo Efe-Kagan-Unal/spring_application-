@@ -1,0 +1,54 @@
+package com.example.demo.service;
+
+import com.example.demo.model.User;
+import com.example.demo.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.Optional;
+import java.util.List;
+@Service
+public class UserService {
+
+    @Autowired
+    private UserRepository userRepository;
+
+    // Kullanıcı oluşturma metodu
+    public User createUser(User user) {
+        // Email'in benzersiz olduğunu kontrol et
+        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
+            throw new IllegalArgumentException("Email already exists!");
+        }
+
+        // Username'in benzersiz olduğunu kontrol et
+        if (userRepository.findByUsername(user.getUsername()).isPresent()) {
+            throw new IllegalArgumentException("Username already exists!");
+        }
+
+        // Kullanıcıyı kaydet
+        return userRepository.save(user);
+    }
+
+    // Kullanıcı kimlik doğrulama metodu
+    public Optional<User> authenticate(String username, String password) {
+        // Kullanıcıyı bul ve şifreyi doğrula
+        Optional<User> user = userRepository.findByUsername(username);
+        if (user.isPresent() && user.get().getPassword().equals(password)) {
+            return user;
+        }
+        return Optional.empty();
+   
+        @Service
+public class UserService {
+
+    @Autowired
+    private UserRepository userRepository;
+
+    // Tüm kullanıcıları döndür
+    public List<User> findAllUsers() {
+        return userRepository.findAll();
+      }
+    }
+   
+  }
+}

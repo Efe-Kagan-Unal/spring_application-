@@ -1,0 +1,46 @@
+package com.example.demo.controller;
+
+import com.example.demo.model.User;
+import com.example.demo.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Optional;
+
+@RestController
+@RequestMapping("/api/users") // Tüm kullanıcı işlemleri bu endpoint üzerinden yapılacak
+public class UserController {
+
+    @Autowired
+    private UserService userService;
+
+    // Yeni kullanıcı oluşturma
+    @PostMapping("/create")
+    public ResponseEntity<?> createUser(@RequestBody User user) {
+        try {
+            User createdUser = userService.createUser(user);
+            return ResponseEntity.ok(createdUser); // Başarılıysa kullanıcıyı döndür
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage()); // Hata varsa mesaj döndür
+        }
+    }
+
+    // Kullanıcı kimlik doğrulama
+    @PostMapping("/authenticate")
+    public ResponseEntity<?> authenticateUser(@RequestParam String username, @RequestParam String password) {
+        Optional<User> authenticatedUser = userService.authenticate(username, password);
+        if (authenticatedUser.isPresent()) {
+            return ResponseEntity.ok(authenticatedUser.get()); // Başarılıysa kullanıcıyı döndür
+        } else {
+            return ResponseEntity.status(401).body("Authentication failed!"); // Başarısızsa hata döndür
+        }
+    }
+
+    // Tüm kullanıcıları listeleme
+    @GetMapping
+    public ResponseEntity<List<User>> getAllUsers() {
+    return ResponseEntity.ok(userService.findAllUsers());
+    }
+
+}
